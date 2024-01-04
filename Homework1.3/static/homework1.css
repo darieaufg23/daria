@@ -1,0 +1,21 @@
+body {
+    background-color: #F8E5EE;
+    text-align: center;
+    padding: 50px;
+}
+
+h1 {
+    color: #0066cc;
+}
+
+img {
+    width: 300px; /* Adjust as needed */
+    height: auto;
+}
+.info {
+    text-align: left;
+    margin-top:20;
+    color:#0066cc;
+
+}
+ 
