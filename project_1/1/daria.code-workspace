@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "daria",
+			"path": "../.."
+		},
+		{
+			"name": "goiteens-main",
+			"path": "../../../goiteens-main"
+		}
+	],
+	"settings": {}
+}
