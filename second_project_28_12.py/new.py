@@ -21,11 +21,7 @@ sleep(1)
 # Ausgabe des Reaktionswegs
 print("Der Reaktionsweg beträgt ", reaktionsweg, "Meter")
 
-# Verzögerung der Ausgabe
-sleep(1)
-
-# Ausgabe des Bremswegs
-print("Der Bremsweg beträgt ", bremsweg, "Meter")
+# Verzögerung dprint("Der Bremsweg beträgt ", bremsweg, "Meter")
 
 # Verzögerung der Ausgabe
 sleep(1)
