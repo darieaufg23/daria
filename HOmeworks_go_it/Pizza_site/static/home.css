@@ -1,0 +1,18 @@
+/* home.css */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header {
+    background-color: #007bff98;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+}
+
+h1 {
+    color: #2662a2;
+}

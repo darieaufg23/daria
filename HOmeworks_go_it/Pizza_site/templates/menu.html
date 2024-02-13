@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='menu.css') }}">
+    <title>Menu</title>
+</head>
+<body>
+    <header>
+        Orderman
+    </header>
+
+    <div class="menu-container">
+        <div class="image-container">
+            <!-- Placeholder images for demonstration purposes -->
+            <img src="{{ url_for('static', filename='photo1.jpeg') }}" alt="Pizza 1">
+            <img src="{{ url_for('static', filename='photo2.jpeg') }}" alt="Pizza 2">
+        </div>
+
+        <table class="menu-table">
+            <thead>
+                <tr>
+                    <th>Pizza Name</th>
+                    <th>Ingredients Description</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Pizza menu items -->
+                <tr>
+                    <td>Mexican Fiesta</td>
+                    <td>Spicy tomato sauce, marinated chicken, corn, black pepper, mozzarella cheese, salsa</td>
+                    <td>$12.99</td>
+                </tr>
+                <tr>
+                    <td>Mediterranean Oasis</td>
+                    <td>Tomatoes, black and green olives, feta cheese, red onion, olive oil, thyme</td>
+                    <td>$14.99</td>
+                </tr>
+                <!-- Add more pizza rows as needed -->
+            </tbody>
+        </table>
+
+        <div class="pizza-description">
+            <h2>Pizzas</h2>
+            <p>Delight your taste buds with our delicious selection of pizzas. Each pizza is crafted with the finest ingredients to ensure a flavorful experience.</p>
+            <p>Explore our menu and savor the perfect combination of crust, sauce, cheese, and toppings.</p>
+
+            <a href="{{ url_for('home') }}" class="back-to-start-button">Back to Orderman</a>
+        </div>
+    </div>
+
+    <!-- Your menu content goes here -->
+
+</body>
+</html>
