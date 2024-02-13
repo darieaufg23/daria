@@ -1,92 +1,89 @@
-import pandas as pd
-import yfinance as yf
-import plotly.graph_objects as go
+import numpy as np
+import talib
 
-class OrderBlockIndicator:
-    def __init__(self, symbol: str, timeframe: str = '1d', range_: int = 15) -> None:
-        """
-        Ініціалізація об'єкта OrderBlockIndicator.
+# Input options
+candle_range = 15
+show_pd = False
+show_bearish_bos = False
+show_bullish_bos = False
+bearish_ob_color = (255, 0, 0, 90)
+bullish_ob_color = (0, 255, 0, 90)
+bos_candle_color = (255, 255, 0)
+bullish_trend_color = (0, 255, 0)
+bearish_trend_color = (255, 0, 0)
 
-        :param symbol: Тікер акції.
-        :param timeframe: Таймфрейм для отримання даних (за замовчуванням '1d').
-        :param range_: Розмір блоку замовлень (за замовчуванням 15).
-        """
-        self.symbol = symbol
-        self.timeframe = timeframe
-        self.range = range_
-        self.data = self.get_price_data()
-        self.fig = go.Figure()
+# Initialize variables
+last_down_index = 0
+last_down = 0
+last_low = 0
+last_up_index = 0
+last_up = 0
+last_up_low = 0
+last_up_open = 0
+last_high = 0
+last_bull_break_low = 0
+structure_low_index = 0
+structure_low = 1000000
+long_boxes = []
+short_boxes = []
+bos_lines = []
 
-    def get_price_data(self) -> pd.DataFrame:
-        """
-        Отримати історію цін для заданого тікера, таймфрейму та періоду.
+# Calculate the lowest point in the range
+def structure_low_index_pointer(length):
+    min_value = np.max(high[-length-1:-1])
+    min_index = bar_index
+    for i in range(length):
+        if low[i] < min_value:
+            min_value = low[i]
+            min_index = bar_index[i]
+    return min_index
 
-        :return: DataFrame з історією цін.
-        """
-        stock_data = yf.download(self.symbol, period='1d', interval='1m')
-        return stock_data
+# Bearish break of structure
+if np.cross(low, structure_low):
+    if (bar_index - last_up_index) < 1000:
+        # Add bear order block
+        short_boxes.append((last_up_index, last_high, last_up_low, last_up_index, bearish_ob_color))
+        # Add bearish bos line
+        if show_bearish_bos:
+            bos_lines.append((structure_low_index, structure_low, bar_index, structure_low, (255, 0, 0), 2))
+        # Set BosCandle to True
+        bos_candle = True
+        # Set CandleColourMode to bearish
+        candle_colour_mode = 0
+        last_short_index = last_up_index
 
-    def structure_low_index_pointer(self, low_prices: pd.Series, range_: int) -> int:
-        """
-        Знайти індекс мінімальної ціни в заданому діапазоні.
+# Bullish break of structure
+if short_boxes:
+    for i in range(len(short_boxes) - 1, -1, -1):
+        box = short_boxes[i]
+        top = box[1]
+        left = box[0]
+        if close > top:
+            # Remove the short box
+            short_boxes.pop(i)
+            # Check conditions for drawing bullish order block
+            if (bar_index - last_down_index) < 1000 and bar_index > last_long_index:
+                long_boxes.append((last_down_index, last_down, last_low, last_down_index, bullish_ob_color))
+                # Add bullish bos line
+                if show_bullish_bos:
+                    bos_lines.append((left, top, bar_index, top, (0, 255, 0), 1))
+                # Set BosCandle to True
+                bos_candle = True
+                # Set CandleColourMode to bullish
+                candle_colour_mode = 1
+                # Record last bull bar index to prevent duplication
+                last_long_index = bar_index
+                last_bull_break_low = low
 
-        :param low_prices: Серія з низькими цінами.
-        :param range_: Розмір блоку замовлень.
-        :return: Індекс мінімальної ціни.
-        """
-        min_value = min(low_prices[:-1][-range_:])
-        min_index = len(low_prices) - 1
+# Remove bullish order block if close is below
+if long_boxes:
+    for i in range(len(long_boxes) - 1, -1, -1):
+        box = long_boxes[i]
+        bottom = box[2]
+        if close < bottom:
+            long_boxes.pop(i)
 
-        for i in range(1, range_ + 1):
-            if low_prices[-i] < min_value:
-                min_value = low_prices[-i]
-                min_index = len(low_prices) - i
-
-        return min_index
-
-    def plot_order_blocks(self) -> None:
-        """
-        Логіка для візуалізації блоків замовлень.
-        """
-        # Додайте свою логіку тут
-        pass
-
-    def plot_similar_lines(self, x: pd.Index, y: pd.Series, color: str) -> None:
-        """
-        Вивести лінії для аналогічних висот чи мінімумів.
-
-        :param x: Індекс графіка.
-        :param y: Серія цін.
-        :param color: Колір ліній.
-        """
-        for i in range(len(x) - 1):
-            self.fig.add_trace(go.Scatter(x=[x[i], x[i + 1]], y=[y[i], y[i + 1]], mode='lines', line=dict(color=color)))
-
-    def plot_chart(self) -> None:
-        """
-        Відобразити графік.
-        """
-        self.fig = go.Figure(data=[go.Candlestick(x=self.data.index,
-                                                  open=self.data['Open'],
-                                                  high=self.data['High'],
-                                                  low=self.data['Low'],
-                                                  close=self.data['Close'])])
-
-        self.plot_order_blocks()
-
-        self.plot_similar_lines(self.data.index, self.data['High'], 'green')  
-        
-
-        self.fig.update_layout(
-            paper_bgcolor='white',  
-            plot_bgcolor='white',   
-            xaxis=dict(gridcolor='lightgray'),  
-            yaxis=dict(gridcolor='lightgray'),  
-        )
-
-        self.fig.show()
-
-if __name__ == "__main__":
-    symbol = "AAPL"
-    indicator = OrderBlockIndicator(symbol)
-    indicator.plot_chart()
+# Candle coloring
+candle_colour = bullish_trend_color if candle_colour_mode == 1 else bearish_trend_color
+candle_colour = bos_candle_color if bos_candle else candle_colour
+plot(bar_index, close, color=candle_colour)
