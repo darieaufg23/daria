@@ -1,0 +1,11 @@
+<!-- templates/market/list.html -->
+
+{% extends "base.html" %}
+{% block content %}
+  <h1>Список продуктів</h1>
+  <ul>
+    {% for product in products %}
+      <li>{{ product.name }} - {{ product.price }}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}
